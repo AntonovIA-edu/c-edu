@@ -1,0 +1,133 @@
+#include <iostream>
+#include <string>
+#include <stdlib.h>
+#pragma hdrstop
+
+using namespace std;
+const int SZ = 100;
+class Decimal
+{
+private:
+    char vlstr[SZ];
+    int vlen;
+    Decimal multdigit(const int) const;
+    Decimal mult10(const Decimal) const;
+public:
+    Decimal() : vlen(0)
+    {
+        vlstr[0] = '\0';
+    }
+    Decimal(const char S[SZ])
+    {
+        strcpy(vlstr, S);
+        vlen = strlen(S);
+    }
+    Decimal(const unsigned long n)
+    {
+        ltoa(n, vlstr, 10);
+        strrev(vlstr);
+        vlen = strlen(vlstr);
+    }
+    void putvl() const;
+    void getvl();
+    Decimal operator + (const Decimal);
+    Decimal operator * (const Decimal);
+
+
+};
+
+void Decimal::putvl() const
+{
+    char temp[SZ];
+    strcpy(temp, vlstr);
+    cout << strrev(temp);
+}
+void Decimal::getvl()
+{
+    cin >> vlstr;
+    vlen = strlen(vlstr);
+    strrev(vlstr);
+}
+Decimal Decimal :: operator + (const Decimal V)
+{
+    char temp[SZ];
+    int j;
+    int maxlen = (vlen > V.vlen) ? vlen : V.vlen;
+    int carry = 0;
+    for (j = 0; j < maxlen; j++)
+    {
+        int d1 = (j > vlen - 1) ? 0 : vlstr[j] - '0';
+        int d2 = (j > V.vlen - 1) ? 0 : V.vlstr[j] - '0';
+        int digitsum = d1 + d2 + carry;
+        if (digitsum >= 10)
+        {
+            digitsum -= 10; carry = 1;
+        }
+        else
+            carry = 0;
+        temp[j] = digitsum + '0';
+    }
+    if (carry == 1)
+        temp[j++] = '1';
+    temp[j] = '\0';
+    return Decimal(temp);
+}
+Decimal Decimal :: operator * (const Decimal V)
+{
+    Decimal pprod;
+    Decimal tempsum;
+    for (int j = 0; j < V.vlen; j++)
+    {
+        int digit = V.vlstr[j] - '0';
+        pprod = multdigit(digit);
+        for (int k = 0; k < j; k++)
+            pprod = mult10(pprod);
+        tempsum = pprod;
+        return tempsum;
+    }
+
+    Decimal Decimal::mult10(const Decimal V)
+    {
+        char temp[SZ];
+        for (int j = v.vlen - 1; j >= 0; j--)
+            temp[j + 1] = v.vlen[j];
+        temp[0] = '0';
+        temp[v.vlen + 1] = '\0';
+        return Decimal(temp);
+    }
+    Decimal Decimal::multdigit(const int d2)
+    {
+        char temp[SZ];
+        int j, carry = 0;
+        for (j = 0; j < vlen; j++)
+        {
+            int d1 = vlstr[j] - '0';
+            int digitprod = d1 * d2;
+            digitprod += carry;
+            if (digitprod >= 10)
+            {
+                carry = digitprod / 10;
+                digitprod -= carry * 10;
+            }
+            else
+                carry = 0;
+            temp[j] = digitprod + '0';
+        }
+        if (carry != 0)
+            temp[j++] = carry + '0';
+        temp[j] = '\0';
+        return Decimal(temp);
+    }
+
+    int main()
+    {
+        unsigned long numb, j;
+        Decimal fact = 1;
+        cin >> numb;
+        for (j = numb; j > 0; j--)
+            fact = fact * j;
+        fact putvl();
+        getch();
+    }
+    return 1;
+}
