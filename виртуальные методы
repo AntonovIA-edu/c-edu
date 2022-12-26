@@ -1,133 +1,144 @@
-#include <iostream>
-#include <string>
-#include <stdlib.h>
-#pragma hdrstop
-
+#include <iostream> 
 using namespace std;
-const int SZ = 100;
+const int arr_size = 15;
+class Array
+{
+    unsigned char arr[arr_size];
+    int size = 0;
+protected:
+    void Sum(Array arr2)
+    {
+        if (size >= arr2.size)
+        {
+            for (int i = 0; i < arr2.size; i++)
+            {
+                arr[i] += arr2.arr[i];
+            }
+        }
+        else
+        {
+            for (int i = 0; i < size; i++)
+            {
+                arr[i] += arr2.arr[i];
+            }
+        }
+    }
+public:
+    int get_size()
+    {
+        return size;
+    }
+    Array(int size, unsigned char data = '0')
+    {
+        if (size <= arr_size)
+        {
+            this->size = size;
+        }
+        arr[0] = data;
+    }
+    unsigned char& operator[] (int index)
+    {
+        if (index < size && index >= 0)
+            return arr[index];
+    }
+    virtual void ArraySum(Array arr2)
+    {
+        Sum(arr2);
+        cout << "\nClass Array";
+    }
+
+};
+class Array2 :public Array
+{
+public:
+    Array2(int size, unsigned char data = '0') :Array(size, data) {};
+    void ArraySum(Array arr2) override
+    {
+        Sum(arr2);
+
+        cout << endl << "Class Array2 ";
+    }
+};
+class Array3 :public Array2
+{
+public:
+    Array3(int size, unsigned char data = '0') :Array2(size, data) {};
+    void ArraySum(Array arr2) override
+    {
+        Sum(arr2);
+        cout << endl << "Class Array3 ";
+    }
+};
 class Decimal
 {
 private:
-    char vlstr[SZ];
-    int vlen;
-    Decimal multdigit(const int) const;
-    Decimal mult10(const Decimal) const;
+    unsigned char digits[100];
+    bool sign;
 public:
-    Decimal() : vlen(0)
+    Decimal(int size, unsigned char data = '0', bool sign = true)
     {
-        vlstr[0] = '\0';
-    }
-    Decimal(const char S[SZ])
-    {
-        strcpy(vlstr, S);
-        vlen = strlen(S);
-    }
-    Decimal(const unsigned long n)
-    {
-        ltoa(n, vlstr, 10);
-        strrev(vlstr);
-        vlen = strlen(vlstr);
-    }
-    void putvl() const;
-    void getvl();
-    Decimal operator + (const Decimal);
-    Decimal operator * (const Decimal);
+        if (size <= 100)
+        {
+            this->sign = sign;
+        }
 
-
+        digits[0] = data;
+    }
+    unsigned char& operator[] (int index)
+    {
+        if (index < 100 && index >= 0)
+            return digits[index];
+    }
+    bool getSign()
+    {
+        return sign;
+    }
+    void setSign(bool sign)
+    {
+        this->sign = sign;
+    }
 };
 
-void Decimal::putvl() const
+class BitString
 {
-    char temp[SZ];
-    strcpy(temp, vlstr);
-    cout << strrev(temp);
-}
-void Decimal::getvl()
-{
-    cin >> vlstr;
-    vlen = strlen(vlstr);
-    strrev(vlstr);
-}
-Decimal Decimal :: operator + (const Decimal V)
-{
-    char temp[SZ];
-    int j;
-    int maxlen = (vlen > V.vlen) ? vlen : V.vlen;
-    int carry = 0;
-    for (j = 0; j < maxlen; j++)
-    {
-        int d1 = (j > vlen - 1) ? 0 : vlstr[j] - '0';
-        int d2 = (j > V.vlen - 1) ? 0 : V.vlstr[j] - '0';
-        int digitsum = d1 + d2 + carry;
-        if (digitsum >= 10)
-        {
-            digitsum -= 10; carry = 1;
-        }
-        else
-            carry = 0;
-        temp[j] = digitsum + '0';
-    }
-    if (carry == 1)
-        temp[j++] = '1';
-    temp[j] = '\0';
-    return Decimal(temp);
-}
-Decimal Decimal :: operator * (const Decimal V)
-{
-    Decimal pprod;
-    Decimal tempsum;
-    for (int j = 0; j < V.vlen; j++)
-    {
-        int digit = V.vlstr[j] - '0';
-        pprod = multdigit(digit);
-        for (int k = 0; k < j; k++)
-            pprod = mult10(pprod);
-        tempsum = pprod;
-        return tempsum;
-    }
+private:
+    unsigned char bits[100];
 
-    Decimal Decimal::mult10(const Decimal V)
+public:
+    BitString(int size, unsigned char data = '0')
     {
-        char temp[SZ];
-        for (int j = v.vlen - 1; j >= 0; j--)
-            temp[j + 1] = v.vlen[j];
-        temp[0] = '0';
-        temp[v.vlen + 1] = '\0';
-        return Decimal(temp);
-    }
-    Decimal Decimal::multdigit(const int d2)
-    {
-        char temp[SZ];
-        int j, carry = 0;
-        for (j = 0; j < vlen; j++)
+        if (size <= 100)
         {
-            int d1 = vlstr[j] - '0';
-            int digitprod = d1 * d2;
-            digitprod += carry;
-            if (digitprod >= 10)
-            {
-                carry = digitprod / 10;
-                digitprod -= carry * 10;
-            }
-            else
-                carry = 0;
-            temp[j] = digitprod + '0';
+            bits[0] = data;
         }
-        if (carry != 0)
-            temp[j++] = carry + '0';
-        temp[j] = '\0';
-        return Decimal(temp);
     }
-
-    int main()
+    unsigned char& operator[] (int index)
     {
-        unsigned long numb, j;
-        Decimal fact = 1;
-        cin >> numb;
-        for (j = numb; j > 0; j--)
-            fact = fact * j;
-        fact putvl();
-        getch();
+        if (index < 100 && index >= 0)
+            return bits[index];
     }
-    return 1;
+};
+int main()
+{
+    setlocale(LC_ALL, "RU");
+    Decimal dec(5, '777');
+    cout << "Десятичное число: ";
+    for (int i = 0; i < 10; i++)
+    {
+        cout << dec[i];
+    }
+    cout << endl;
+    cout << "Знак: " << dec.getSign() << endl;
+    dec.setSign(false);
+    cout << "Обновленный знак: " << dec.getSign() << endl;
+
+    BitString bs(8, '1');
+    cout << "Битовая строка: ";
+    for (int i = 0; i < 8; i++)
+    {
+        cout << bs[i];
+    }
+    cout << endl;
+
+    return 0;
 }
