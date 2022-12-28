@@ -1,144 +1,103 @@
-#include <iostream> 
+#include <iostream>
+#include <string>
 using namespace std;
-const int arr_size = 15;
-class Array
+class TDecimal
 {
-    unsigned char arr[arr_size];
-    int size = 0;
-protected:
-    void Sum(Array arr2)
-    {
-        if (size >= arr2.size)
-        {
-            for (int i = 0; i < arr2.size; i++)
-            {
-                arr[i] += arr2.arr[i];
-            }
-        }
-        else
-        {
-            for (int i = 0; i < size; i++)
-            {
-                arr[i] += arr2.arr[i];
-            }
-        }
-    }
 public:
-    int get_size()
+    enum { SIZE = 100 };
+
+protected:
+    unsigned char val[SIZE];
+    unsigned size;
+
+public:
+    TDecimal(unsigned value = 0) : size(0)
+    {
+        *this = value;
+    }
+    TDecimal(const string& value) : size(0)
+    {
+        *this = value;
+    }
+
+    TDecimal& operator = (unsigned value)
+    {
+        size = 0;
+        while (value)
+        {
+            val[size++] = value % 10;
+            value /= 10;
+        }
+
+        return *this;
+    }
+    TDecimal& operator = (const string& value)
+    {
+        size = value.size();
+        for (unsigned i = 0; i < size; ++i)
+        {
+            val[i] = value[size - i - 1] - 48;
+        }
+
+        return *this;
+    }
+
+    unsigned operator [] (unsigned i)
+    {
+        unsigned char digit = 0;
+
+        if (i < size)
+        {
+            digit = val[size - i];
+        }
+
+        return digit;
+    }
+
+    TDecimal operator + (const TDecimal& dec)
+    {
+        TDecimal result;
+
+        unsigned mod = 0;
+
+        result.size = (size < dec.size) ? dec.size : size;
+
+        for (unsigned i = 0; i < result.size; ++i)
+        {
+            result.val[i] = val[i] + dec.val[i] + mod;
+
+            mod = result.val[i] / 10;
+
+            result.val[i] %= 10;
+        }
+
+        if (mod)
+        {
+            result.val[result.size++] = 1;
+        }
+
+        return result;
+    }
+
+    unsigned GetSize() const
     {
         return size;
     }
-    Array(int size, unsigned char data = '0')
+
+    friend ostream& operator << (ostream& os, const TDecimal& digit)
     {
-        if (size <= arr_size)
+        for (unsigned i = digit.size - 1; i < digit.size; --i)
         {
-            this->size = size;
+            os << (unsigned)digit.val[i];
         }
-        arr[0] = data;
-    }
-    unsigned char& operator[] (int index)
-    {
-        if (index < size && index >= 0)
-            return arr[index];
-    }
-    virtual void ArraySum(Array arr2)
-    {
-        Sum(arr2);
-        cout << "\nClass Array";
-    }
-
-};
-class Array2 :public Array
-{
-public:
-    Array2(int size, unsigned char data = '0') :Array(size, data) {};
-    void ArraySum(Array arr2) override
-    {
-        Sum(arr2);
-
-        cout << endl << "Class Array2 ";
-    }
-};
-class Array3 :public Array2
-{
-public:
-    Array3(int size, unsigned char data = '0') :Array2(size, data) {};
-    void ArraySum(Array arr2) override
-    {
-        Sum(arr2);
-        cout << endl << "Class Array3 ";
-    }
-};
-class Decimal
-{
-private:
-    unsigned char digits[100];
-    bool sign;
-public:
-    Decimal(int size, unsigned char data = '0', bool sign = true)
-    {
-        if (size <= 100)
-        {
-            this->sign = sign;
-        }
-
-        digits[0] = data;
-    }
-    unsigned char& operator[] (int index)
-    {
-        if (index < 100 && index >= 0)
-            return digits[index];
-    }
-    bool getSign()
-    {
-        return sign;
-    }
-    void setSign(bool sign)
-    {
-        this->sign = sign;
-    }
-};
-
-class BitString
-{
-private:
-    unsigned char bits[100];
-
-public:
-    BitString(int size, unsigned char data = '0')
-    {
-        if (size <= 100)
-        {
-            bits[0] = data;
-        }
-    }
-    unsigned char& operator[] (int index)
-    {
-        if (index < 100 && index >= 0)
-            return bits[index];
+        return os;
     }
 };
 int main()
 {
-    setlocale(LC_ALL, "RU");
-    Decimal dec(5, '777');
-    cout << "Десятичное число: ";
-    for (int i = 0; i < 10; i++)
-    {
-        cout << dec[i];
-    }
-    cout << endl;
-    cout << "Знак: " << dec.getSign() << endl;
-    dec.setSign(false);
-    cout << "Обновленный знак: " << dec.getSign() << endl;
+    TDecimal a(8), b("2");
 
-    BitString bs(8, '1');
-    cout << "Битовая строка: ";
-    for (int i = 0; i < 8; i++)
-    {
-        cout << bs[i];
-    }
-    cout << endl;
+    cout << (a + b) << endl;
 
     return 0;
 }
